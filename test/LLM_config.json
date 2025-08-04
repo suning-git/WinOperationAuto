@@ -1,0 +1,9 @@
+{
+  "provider": "openai",
+  "openai_model": "gpt-4o",
+  "deepseek_model": "deepseek-chat",
+  "max_tokens": 200,
+  "temperature": 0.7,
+  "system_prompt_file": "system_prompt.md",
+  "user_prompt_template": "{input}"
+}

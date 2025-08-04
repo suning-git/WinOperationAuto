@@ -72,7 +72,7 @@ bool SpecialKeyHandler::ProcessSpecialKeyEvent(USHORT vKey, USHORT flags, bool i
                     std::cout << "[SPECIAL] Right Ctrl pressed alone (no key combinations)\n";
                     OnRightCtrlPressed(keyState.pressTimestamp, timestamp, keyState.pressPosition, cursorPos);
                 } else {
-                    std::cout << "[SPECIAL] Left Ctrl pressed alone (no key combinations)\n";
+                    std::cout << "[TRIGGER] Left Ctrl pressed - triggering input completion\n";
                     OnLeftCtrlPressed(keyState.pressTimestamp, timestamp, keyState.pressPosition, cursorPos);
                 }
             } else {
@@ -125,15 +125,13 @@ void SpecialKeyHandler::NotifyRegularKeyPressed(USHORT vKey) {
 void SpecialKeyHandler::OnLeftCtrlPressed(std::uint64_t pressTime, std::uint64_t releaseTime, POINT pressPos, POINT releasePos) {
     std::uint64_t duration = releaseTime - pressTime;
     
-    std::cout << "\n*** LEFT CTRL PRESSED - GENERATING SUGGESTION ***\n";
-    std::cout << "Calling Python script to process input events...\n";
+    std::cout << "\n[AI] Generating input completion...\n";
     
     // Call Python script to process input_events.txt (script is now in same directory as exe)
     std::string pythonCmd = "python process_input.py";
     int result = system(pythonCmd.c_str());
     
     if (result == 0) {
-        std::cout << "[SUCCESS] Python script completed successfully\n";
         
         // Read Python output (now in same directory as executable)
         std::ifstream outputFile("python_output.txt");
@@ -150,15 +148,11 @@ void SpecialKeyHandler::OnLeftCtrlPressed(std::uint64_t pressTime, std::uint64_t
                     // Show suggestion in overlay
                     SuggestionOverlay::ShowSuggestion(outputLine);
                     
-                    std::cout << "\n========================================\n";
-                    std::cout << " LLM SUGGESTION READY:\n";
-                    std::cout << "   Text to inject: \"" << outputLine << "\"\n";
-                    std::cout << "   Press RIGHT CTRL to accept and inject\n";
-                    std::cout << "   Or ignore to cancel\n";
-                    std::cout << "========================================\n\n";
+                    std::cout << "\n[READY] Completion: \"" << outputLine << "\"\n";
+                    std::cout << "[READY] Press RIGHT CTRL to accept, or ignore to cancel\n";
                     
                 } else {
-                    std::cout << "[INFO] Python script returned no suggestion\n";
+                    std::cout << "[INFO] No completion available\n";
                     s_hasPendingSuggestion = false;
                 }
             } else {

@@ -79,7 +79,7 @@ bool SuggestionOverlay::CreateOverlayWindow() {
         className,
         L"LLM Suggestion",
         WS_POPUP | WS_BORDER, // Popup window with border
-        100, 100, 600, 80,    // Position and size (smaller but with bigger font)
+        100, 100, 600, 50,    // Position and size (better height for single line)
         nullptr, nullptr,
         GetModuleHandle(nullptr),
         nullptr
@@ -144,16 +144,23 @@ void SuggestionOverlay::DrawSuggestion(HDC hdc, RECT& rect) {
     
     HFONT oldFont = (HFONT)SelectObject(hdc, hFont);
     
-    // Add prefix and draw text
-    std::string displayText = "[AI]: " + s_currentSuggestion;
-    std::wstring wDisplayText(displayText.begin(), displayText.end());
+    // Add symbol prefix and draw text - try light bulb, fallback to simple symbol
+    std::wstring wDisplayText = L"\U0001F4A1 ";  // Unicode light bulb emoji (💡)
+    // If emoji doesn't work, you can replace above line with one of these:
+    // std::wstring wDisplayText = L"\u2022 ";     // Bullet point (•)
+    // std::wstring wDisplayText = L"\u25B6 ";     // Right triangle (▶)
+    // std::wstring wDisplayText = L"AI: ";        // Simple text fallback
     
-    // Draw with padding
+    // Convert suggestion to wide string and append
+    std::wstring wSuggestion(s_currentSuggestion.begin(), s_currentSuggestion.end());
+    wDisplayText += wSuggestion;
+    
+    // Draw with padding (reduced for smaller height)
     RECT textRect = rect;
     textRect.left += 10;
-    textRect.top += 8;
+    textRect.top += 5;
     textRect.right -= 10;
-    textRect.bottom -= 8;
+    textRect.bottom -= 5;
     
     DrawTextW(hdc, wDisplayText.c_str(), -1, &textRect, 
               DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
@@ -172,13 +179,13 @@ LRESULT CALLBACK SuggestionOverlay::OverlayWindowProc(HWND hWnd, UINT message, W
         RECT rect;
         GetClientRect(hWnd, &rect);
         
-        // Fill background
-        HBRUSH bgBrush = CreateSolidBrush(RGB(45, 45, 48));
+        // Fill background with a subtle blue tint to indicate AI suggestion
+        HBRUSH bgBrush = CreateSolidBrush(RGB(40, 50, 70));  // Dark blue-gray
         FillRect(hdc, &rect, bgBrush);
         DeleteObject(bgBrush);
         
-        // Draw border
-        HPEN borderPen = CreatePen(PS_SOLID, 1, RGB(100, 100, 100));
+        // Draw border with a subtle blue accent
+        HPEN borderPen = CreatePen(PS_SOLID, 1, RGB(70, 130, 180));
         HPEN oldPen = (HPEN)SelectObject(hdc, borderPen);
         
         MoveToEx(hdc, 0, 0, nullptr);

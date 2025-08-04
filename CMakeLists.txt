@@ -37,33 +37,39 @@ if(MSVC)
     )
 endif()
 
-# Create test directory if it doesn't exist
-file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+# Define install folder variable
+set(INSTALL_FOLDER ${CMAKE_SOURCE_DIR}/test)
 
-# Build to standard location and copy exe to test folder (avoids Debug/Release subfolders)
+# Create install directory if it doesn't exist
+file(MAKE_DIRECTORY ${INSTALL_FOLDER})
+
+# Build to standard location and copy exe to install folder (avoids Debug/Release subfolders)
 set_target_properties(WinOpAutoMouseKeybdtest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-# Copy executable and Python scripts to test folder after build
+# Copy executable and Python scripts to install folder after build
 add_custom_command(TARGET WinOpAutoMouseKeybdtest POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy 
     $<TARGET_FILE:WinOpAutoMouseKeybdtest>
-    ${CMAKE_SOURCE_DIR}/test/
+    ${INSTALL_FOLDER}/
     COMMAND ${CMAKE_COMMAND} -E copy 
     ${CMAKE_SOURCE_DIR}/src/process_input.py
-    ${CMAKE_SOURCE_DIR}/test/
+    ${INSTALL_FOLDER}/
     COMMAND ${CMAKE_COMMAND} -E copy 
     ${CMAKE_SOURCE_DIR}/src/llm_handler.py
-    ${CMAKE_SOURCE_DIR}/test/
+    ${INSTALL_FOLDER}/
     COMMAND ${CMAKE_COMMAND} -E copy 
     ${CMAKE_SOURCE_DIR}/src/input_cleaner.py
-    ${CMAKE_SOURCE_DIR}/test/
+    ${INSTALL_FOLDER}/
     COMMAND ${CMAKE_COMMAND} -E copy 
-    ${CMAKE_SOURCE_DIR}/src/LLM_prompts.json
-    ${CMAKE_SOURCE_DIR}/test/
+    ${CMAKE_SOURCE_DIR}/src/LLM_config.json
+    ${INSTALL_FOLDER}/
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    ${CMAKE_SOURCE_DIR}/src/system_prompt.md
+    ${INSTALL_FOLDER}/
     COMMAND ${CMAKE_COMMAND} -E copy 
     ${CMAKE_SOURCE_DIR}/src/requirements.txt
-    ${CMAKE_SOURCE_DIR}/test/
-    COMMENT "Copying executable and Python scripts to test folder"
+    ${INSTALL_FOLDER}/
+    COMMENT "Copying executable, Python scripts, and configuration files to install folder"
 )

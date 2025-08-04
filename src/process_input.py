@@ -2,6 +2,10 @@
 """
 Input processing script for WinOpAuto
 Reads input_events.txt, processes keyboard events, and generates key outputs.
+
+Debug Mode:
+Set environment variable DEBUG=1 to see detailed input/output messages.
+Example: set DEBUG=1 && python process_input.py
 """
 
 import json
@@ -37,25 +41,7 @@ def read_input_events(filepath: str) -> List[Dict]:
     print(f"[INFO] Read {len(events)} events from {filepath}")
     return events
 
-def remove_trailing_ctrl_events(events: List[Dict]) -> List[Dict]:
-    """Remove Ctrl key events from the end of the event list."""
-    # Work backwards from the end
-    filtered_events = events.copy()
-    
-    # Remove events from the end while they are Ctrl-related
-    while filtered_events:
-        last_event = filtered_events[-1]
-        
-        # Check if it's a Ctrl key event
-        if (last_event.get("type") == "keyboard" and 
-            last_event.get("key") == "CTRL"):
-            print(f"[INFO] Removing Ctrl event: {last_event}")
-            filtered_events.pop()
-        else:
-            break
-    
-    print(f"[INFO] Filtered events: {len(events)} -> {len(filtered_events)}")
-    return filtered_events
+
 
 def extract_input_sequence(events: List[Dict]) -> str:
     """Extract the sequence of user inputs (characters + special keys + mouse events)."""
@@ -129,23 +115,35 @@ def extract_input_sequence(events: List[Dict]) -> str:
 
 def process_with_llm(input_sequence: str) -> Optional[str]:
     """Process input sequence with LLM and get response."""
+    import os
     from llm_handler import LLMHandler
     from input_cleaner import clean_input_for_llm
+    
+    # Check if we're in debug mode (can be set via environment variable)
+    debug_mode = False
     
     try:
         # Clean the input for better LLM processing
         cleaned_input = clean_input_for_llm(input_sequence)
-        print(f"[CLEAN] Original: '{input_sequence}' -> Cleaned: '{cleaned_input}'")
+        
+        if debug_mode:
+            print(f"[CLEAN] Input to LLM: {cleaned_input}")
+        else:
+            print(f"[CLEAN] Input processed: {len(cleaned_input)} characters")
         
         # Use cleaned input for LLM
-        llm = LLMHandler()
+        llm = LLMHandler(debug=debug_mode)
         response = llm.generate_response(cleaned_input)
         
         if response and response.strip():
-            print(f"[LLM] Generated response: '{response}'")
-            return response.strip()
+            if debug_mode:
+                print(f"[DEBUG] LLM response: '{response}'")
+            else:
+                print(f"[LLM] Generated completion: '{response}'")
+            # Don't strip leading/trailing spaces - they're important for text completion
+            return response
         else:
-            print(f"[LLM] No response generated")
+            print(f"[LLM] No completion generated")
             return None
             
     except Exception as e:
@@ -176,23 +174,20 @@ def main():
         print("[ERROR] No events to process")
         return 1
     
-    # Remove trailing Ctrl events (since Ctrl triggered this script)
-    filtered_events = remove_trailing_ctrl_events(events)
-    
-    # Extract the input sequence for LLM
-    input_sequence = extract_input_sequence(filtered_events)
+    # Extract the input sequence for LLM (Ctrl events already filtered by input_cleaner.py)
+    input_sequence = extract_input_sequence(events)
     
     # Process with LLM and generate output
     output_keys = process_with_llm(input_sequence)
     
     if output_keys:
         write_output(output_keys, output_file)
-        print("[SUCCESS] Pattern matched and output generated!")
+        print("[SUCCESS] Completion ready for injection")
         return 0
     else:
         # Write empty output to indicate no match
         write_output("", output_file)
-        print("[INFO] No pattern match - empty output generated")
+        print("[INFO] No completion generated")
         return 0
 
 if __name__ == "__main__":

@@ -2,28 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch WinOpAutoMouseKeybdtest",
+            "name": "Debug WinOpAuto",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/Release/WinOpAutoMouseKeybdtest.exe",
+            "program": "${workspaceFolder}/build/bin/WinOpAutoMouseKeybdtest.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
-            "preLaunchTask": "CMake: Build Release"
+            "preLaunchTask": "Build"
         },
         {
-            "name": "Launch WinOpAutoMouseKeybdtest (Debug Console)",
+            "name": "Debug WinOpAuto (from test folder)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/Release/WinOpAutoMouseKeybdtest.exe",
+            "program": "${workspaceFolder}/test/WinOpAutoMouseKeybdtest.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/test",
             "environment": [],
-            "console": "integratedTerminal",
-            "preLaunchTask": "CMake: Build Release"
+            "console": "externalTerminal",
+            "preLaunchTask": "Build"
         }
     ]
 }

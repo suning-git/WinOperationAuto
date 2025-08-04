@@ -30,6 +30,7 @@ Thumbs.db
 
 # IDE
 .vscode/settings.json
+launch_cursor.lnk
 
 # Temporary files
 *.tmp
