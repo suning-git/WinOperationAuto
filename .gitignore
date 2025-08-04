@@ -1,0 +1,38 @@
+# Build artifacts
+build/
+bin/
+*.exe
+*.obj
+*.pdb
+*.ilk
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.sln
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Test outputs
+test/input_events.txt
+test/python_output.txt
+
+# Secret API keys - NEVER commit these!
+test/SECRET
+SECRET
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~

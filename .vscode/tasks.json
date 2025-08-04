@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "options": {
+        "shell": {
+            "executable": "powershell.exe",
+            "args": [
+                "-NoExit",
+                "-Command",
+                "Import-Module 'E:\\Applications\\MicrosoftVisualStudio\\2022\\Community\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll'; Enter-VsDevShell -VsInstallPath 'E:\\Applications\\MicrosoftVisualStudio\\2022\\Community' -SkipAutomaticLocation; &"
+            ]
+        }
+    },
+    "tasks": [
+        {
+            "label": "CMake: Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "..",
+                "-G",
+                "Visual Studio 17 2022",
+                "-A",
+                "x64"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "group": "build", 
+            "detail": "Configure CMake project",
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: Build Release",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                ".",
+                "--config",
+                "Release"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build Release configuration",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "CMake: Configure and Build",
+            "type": "shell",
+            "command": "cmake .. -G 'Visual Studio 17 2022' -A x64 && cmake --build . --config Release",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "group": "build",
+            "detail": "Configure and build in one step",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Run Application",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/bin/Release/WinOpAutoMouseKeybdtest.exe",
+            "group": "test",
+            "detail": "Run the built application (build first if needed)",
+            "problemMatcher": []
+        }
+    ]
+}
