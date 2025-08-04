@@ -17,8 +17,7 @@ __pycache__/
 *.pyo
 
 # Test outputs
-test/input_events.txt
-test/python_output.txt
+test
 
 # Secret API keys - NEVER commit these!
 test/SECRET
